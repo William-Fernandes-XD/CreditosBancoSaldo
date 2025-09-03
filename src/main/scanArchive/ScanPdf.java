@@ -14,12 +14,12 @@ import main.entidades.EmpregadoPdf;
 public class ScanPdf {
 
 	private String caminho;
-	private List<String> lerNomes;
+	private List<String> matriculas;
 
-	public ScanPdf(String caminho, List<String> lerNomes) {
+	public ScanPdf(String caminho, List<String> matriculas) {
 
 		this.caminho = caminho;
-		this.lerNomes = lerNomes;
+		this.matriculas = matriculas;
 	}
 
 	public List<EmpregadoPdf> scanPdf() {
@@ -33,7 +33,12 @@ public class ScanPdf {
 			int totalPages = documento.getNumberOfPages();
 
 			for (int i = 1; i <= totalPages; i++) {
-
+				
+				int percentage = (int) Math.round((i * 100.0) / totalPages);
+				
+				System.out.print("\rCarregamento: " + percentage + "%");
+				System.out.flush();
+				
 				stripper.setStartPage(i);
 				stripper.setEndPage(i);
 
@@ -44,20 +49,17 @@ public class ScanPdf {
 				}
 
 				boolean nomeListado = false;
-
-				for (String nome : this.lerNomes) {
+				
+				for (String matricula : this.matriculas) {
 					 
 					try {
 						
-						String[] nomeSaturado = nome.split(" ");
-						
-						if (stripper.getText(documento).toLowerCase().contains(nomeSaturado[0].toLowerCase() + " "
-								+ nomeSaturado[1].toLowerCase() + " " + nomeSaturado[2].toLowerCase())) {
+						if (stripper.getText(documento).toLowerCase().contains(matricula.replaceAll("^[A-Z]", "").toLowerCase())) {
 							nomeListado = true;
 						}
 					}catch(Exception e) {
 						
-						if (stripper.getText(documento).toLowerCase().contains(nome.toLowerCase())) {
+						if (stripper.getText(documento).toLowerCase().contains(matricula.toLowerCase())) {
 							nomeListado = true;
 						}
 					}
@@ -77,7 +79,7 @@ public class ScanPdf {
 				for (String linha : linhas) {
 
 					if (nomeListado == true) {
-
+						
 						if (linha.contains("Localização:")) {
 							Pattern padraoMatricula = Pattern.compile("Localização:\\s*(.+)");
 							Matcher matcherMatricula = padraoMatricula.matcher(linha);
@@ -137,7 +139,7 @@ public class ScanPdf {
 					}
 				}
 			}
-
+			
 			return empregadoPdfs;
 		} catch (Exception e) {
 			e.printStackTrace();

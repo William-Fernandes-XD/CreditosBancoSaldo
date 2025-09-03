@@ -41,13 +41,13 @@ public class startup {
 		
 		// Tabela em pdf dos dados de saldo
 		
-		List<String> nomes = new ArrayList<>();
+		List<String> matriculas = new ArrayList<>();
 		
 		for (EmpregadoExcel empregadoExcel : empregadosExcel) {
-			nomes.add(empregadoExcel.getNome());
+			matriculas.add(empregadoExcel.getMatricula());
 		}
 		
-		ScanPdf saldos = new ScanPdf(caminhoPdf, nomes);
+		ScanPdf saldos = new ScanPdf(caminhoPdf, matriculas);
 		
 		List<EmpregadoPdf> empregadosPdf = saldos.scanPdf();
 		
@@ -58,11 +58,7 @@ public class startup {
 		
 		/***
 		 * 
-		 * nome 
-		 * Matricula
-		 * Modelo BH
-		 * Lider
-		 * Saldo
+		 * Junção de todos os dados
 		 * 
 		 */
 		
@@ -84,8 +80,10 @@ public class startup {
 		    	
 		    	empregadoLideres.setNome(texto);
 		    	
-		        if (excelEmpregado.getNome().trim().equalsIgnoreCase(empregadoLideres.getNome().trim())) {
-		            empregadoJuncao.setMatricula(empregadoLideres.getMatricula());
+		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim()
+		        		.contains(empregadoLideres.getMatricula().replaceAll("^[A-Z]", "").trim())) {
+		        	
+		            empregadoJuncao.setMatricula(excelEmpregado.getMatricula());
 		            empregadoJuncao.setLider(empregadoLideres.getLider());
 		            break;
 		        }
@@ -93,7 +91,11 @@ public class startup {
 
 		    // Buscar dados do PDF
 		    for (EmpregadoPdf empregadoPdf : empregadosPdf) {
-		        if (excelEmpregado.getNome().trim().equalsIgnoreCase(empregadoPdf.getNome().trim())) {
+		    	
+		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim().contains(
+		        		empregadoPdf.getMatricula().replaceAll("^[A-Z]", "")
+		        		.substring(1))) {
+		        	
 		            empregadoJuncao.setSaldo(empregadoPdf.getSaldoCiclo());
 		            break;
 		        }
