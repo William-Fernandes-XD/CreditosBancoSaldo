@@ -9,14 +9,15 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import main.entidades.EmpregadoExcel;
 import main.entidades.EmpregadoPdf;
 
 public class ScanPdf {
 
 	private String caminho;
-	private List<String> matriculas;
+	private List<EmpregadoExcel> matriculas;
 
-	public ScanPdf(String caminho, List<String> matriculas) {
+	public ScanPdf(String caminho, List<EmpregadoExcel> matriculas) {
 
 		this.caminho = caminho;
 		this.matriculas = matriculas;
@@ -50,16 +51,16 @@ public class ScanPdf {
 
 				boolean nomeListado = false;
 				
-				for (String matricula : this.matriculas) {
+				for (EmpregadoExcel matricula : this.matriculas) {
 					 
 					try {
 						
-						if (stripper.getText(documento).toLowerCase().contains(matricula.replaceAll("^[A-Z]", "").toLowerCase())) {
+						if (stripper.getText(documento).toLowerCase().contains(matricula.getMatricula().replaceAll("^[A-Z]", "").toLowerCase())) {
 							nomeListado = true;
 						}
 					}catch(Exception e) {
 						
-						if (stripper.getText(documento).toLowerCase().contains(matricula.toLowerCase())) {
+						if (stripper.getText(documento).toLowerCase().contains(matricula.getMatricula().toLowerCase())) {
 							nomeListado = true;
 						}
 					}
@@ -77,7 +78,7 @@ public class ScanPdf {
 				String[] linhas = normalizado.split("\\r?\\n");
 
 				for (String linha : linhas) {
-
+					
 					if (nomeListado == true) {
 						
 						if (linha.contains("Localização:")) {
@@ -85,6 +86,7 @@ public class ScanPdf {
 							Matcher matcherMatricula = padraoMatricula.matcher(linha);
 
 							if (matcherMatricula.find()) {
+								
 								matricula = matcherMatricula.group(1).split(" ")[0];
 
 								Pattern padraoNome = Pattern.compile("CTPS:\\s*(.+?)\\s+Diretoria");
@@ -93,6 +95,7 @@ public class ScanPdf {
 								String nomeAux = "";
 
 								if (matcherNome.find()) {
+									
 									String[] nomeTextoAux = matcherNome.group(1).split(" ");
 
 									for (int j = 1; j < nomeTextoAux.length; j++) {
@@ -123,8 +126,20 @@ public class ScanPdf {
 								Matcher matcherSaldo = padraoSaldo.matcher(linha);
 
 								if (matcherSaldo.find()) {
-
-									saldo = matcherSaldo.group(1).trim().split(" ")[4];
+									
+									for (EmpregadoExcel usuario : matriculas) {
+										
+										if(usuario.getMatricula().replaceAll("^[A-Z]", "").equals(
+												matricula.replaceAll("^[A-Z]", "").substring(1))) {
+											
+											if(usuario.getModeloBH().equalsIgnoreCase("mensal")) {
+												saldo = matcherSaldo.group(1).trim().split(" ")[3];
+											}else {
+												saldo = matcherSaldo.group(1).trim().split(" ")[4];
+											}
+										}
+									}
+									
 									empregadoPdf.setSaldoCiclo(saldo);
 
 								}

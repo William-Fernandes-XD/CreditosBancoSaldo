@@ -1,9 +1,11 @@
 package main.scanArchive;
 
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,15 +29,23 @@ public class SaveToExcel {
 		try {
 			
 			Workbook workbook = new XSSFWorkbook();
-			Sheet sheet = workbook.createSheet("Funcion·rios saldos horas");
+			Sheet sheet = workbook.createSheet("Funcion√°rios saldos horas");
 			
-			 // Criar cabeÁalho
+			 // Criar cabe√ßalho
 	        Row header = sheet.createRow(0);
 	        header.createCell(0).setCellValue("Nome");
-	        header.createCell(1).setCellValue("MatrÌcula");
+	        header.createCell(1).setCellValue("Matr√≠cula");
 	        header.createCell(2).setCellValue("Modelo BH");
-	        header.createCell(3).setCellValue("LÌder");
+	        header.createCell(3).setCellValue("L√≠der");
 	        header.createCell(4).setCellValue("Saldo");
+	        
+	        /**
+		     * 
+		     * Percentage Lideres
+		     * 
+		     */
+		    
+		    Map<String, List<EmpregadoJuncao>> lideres = new HashMap<>();
 	        
 	        int index = 1;
 	        
@@ -53,8 +63,49 @@ public class SaveToExcel {
 	                sheet.autoSizeColumn(i);
 	            }
 	        	
+	        	/**
+	        	 * Lideres
+	        	 */
+	        	
+	        	if(colaborador.getLider() != null && colaborador.getLider().trim() != "") {
+	        		lideres.computeIfAbsent(colaborador.getLider().toUpperCase(), k -> new ArrayList<>()).add(colaborador);
+	        	}
+	        	
 	        	index++;
 			}
+	        
+	        /**
+	         * Colocando as porcentagem para cada lider
+	         */
+	        
+	        int rowPosition = 2; 
+	        
+	        for(Map.Entry<String, List<EmpregadoJuncao>> entry : lideres.entrySet()) {
+	        	
+	        	List<EmpregadoJuncao> empregadosPerLider = entry.getValue();
+	        	
+	        	Row row = sheet.getRow(rowPosition);
+	        	
+	        	float saldoPositivoPercentual = (float) 0.0;
+	        	float saldoNegativoPercentual = (float) 0.0;
+	        	
+	        	for (EmpregadoJuncao empregadoIterable : empregadosPerLider) {
+					
+	        		System.out.println(empregadoIterable.getSaldo());
+	        		
+	        		if(empregadoIterable.getSaldo() != null && empregadoIterable.getSaldo().contains("-")) {
+	        			saldoNegativoPercentual++;
+	        		}else if(empregadoIterable.getSaldo() != null){
+	        			saldoPositivoPercentual++;
+	        		}
+				}
+	        	
+	        	row.createCell(6).setCellValue(entry.getKey());
+	        	row.createCell(7).setCellValue(((saldoPositivoPercentual / empregadosPerLider.size()) * 100) + "%");
+	        	row.createCell(8).setCellValue(((saldoNegativoPercentual / empregadosPerLider.size()) * 100) + "%");
+	        	
+	        	rowPosition++;
+	        }
 	        
 	        try(FileOutputStream fileOutputStream = new FileOutputStream(caminho)){
 	        	workbook.write(fileOutputStream);

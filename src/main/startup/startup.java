@@ -17,9 +17,9 @@ public class startup {
 
 	public static void main(String[] args) {
 		
-		String caminhoExcelReferenciaNomes = "C:/Users/E21057649/Downloads/Banco de Horas Junho (2).xlsx";
-		String caminhoPdf = "C:/Users/E21057649/Downloads/JULHO - EXTRAIDO EM 19 08.pdf";
-		String caminhoExcelReferenciaLideres = "C:/Users/E21057649/Downloads/Ponto COI 2025 (1) (3).xlsx";
+		String caminhoExcelReferenciaNomes = "C:/Users/E21057649/Downloads/BancoHoras.xlsx";
+		String caminhoPdf = "C:/Users/E21057649/Downloads/EspelhoPonto.pdf";
+		String caminhoExcelReferenciaLideres = "C:/Users/E21057649/Downloads/PontoCoi.xlsx";
 		
 		
 		// Tabela excel com os nomes a ser buscado
@@ -41,14 +41,13 @@ public class startup {
 		
 		// Tabela em pdf dos dados de saldo
 		
-		List<String> matriculas = new ArrayList<>();
+		List<EmpregadoExcel> matriculas = new ArrayList<>();
 		
 		for (EmpregadoExcel empregadoExcel : empregadosExcel) {
-			matriculas.add(empregadoExcel.getMatricula());
+			matriculas.add(empregadoExcel);
 		}
 		
 		ScanPdf saldos = new ScanPdf(caminhoPdf, matriculas);
-		
 		List<EmpregadoPdf> empregadosPdf = saldos.scanPdf();
 		
 		// Tabela dos lideres
@@ -65,9 +64,10 @@ public class startup {
 		List<EmpregadoJuncao> empregadoJuncaos = new ArrayList<>();
 		
 		for (EmpregadoExcel excelEmpregado : empregadosExcel) {
+			
 		    EmpregadoJuncao empregadoJuncao = new EmpregadoJuncao();
 		    empregadoJuncao.setNome(excelEmpregado.getNome());
-		    empregadoJuncao.setModeloBh(excelEmpregado.getModeloBH()); // se houver essa info no Excel
+		    empregadoJuncao.setModeloBh(excelEmpregado.getModeloBH()); 
 
 		    // Buscar dados do líder
 		    for (EmpregadoLideres empregadoLideres : empregadosLideres) {
@@ -81,7 +81,7 @@ public class startup {
 		    	empregadoLideres.setNome(texto);
 		    	
 		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim()
-		        		.contains(empregadoLideres.getMatricula().replaceAll("^[A-Z]", "").trim())) {
+		        		.equals(empregadoLideres.getMatricula().replaceAll("^[A-Z]", "").trim())) {
 		        	
 		            empregadoJuncao.setMatricula(excelEmpregado.getMatricula());
 		            empregadoJuncao.setLider(empregadoLideres.getLider());
@@ -92,7 +92,12 @@ public class startup {
 		    // Buscar dados do PDF
 		    for (EmpregadoPdf empregadoPdf : empregadosPdf) {
 		    	
-		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim().contains(
+		    	System.out.println("---------------");
+		    	System.out.println(excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim());
+		    	System.out.println(empregadoPdf.getMatricula().replaceAll("^[A-Z]", "")
+		        		.substring(1));
+		    	
+		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim().equals(
 		        		empregadoPdf.getMatricula().replaceAll("^[A-Z]", "")
 		        		.substring(1))) {
 		        	
@@ -108,9 +113,6 @@ public class startup {
 		/**for (EmpregadoJuncao ej : empregadoJuncaos) {
 		    System.out.println(ej);
 		}**/
-		
-		// removendo o resgate de linha vazia presente no arquivo excel de referencia
-		empregadoJuncaos.remove(0);
 		
 		// criando o arquivo com a lista de empregadosJuncao
 		

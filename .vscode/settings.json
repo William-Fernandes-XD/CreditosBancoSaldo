@@ -1,0 +1,18 @@
+{
+
+    "java.project.referencedLibraries": [
+    "src/libs/**/*.jar"
+],
+
+"java.configuration.runtimes": [
+    {
+        "name": "JavaSE-11",
+        "path": "C:/Users/E21057649/Documents/jdk-11.0.26",   // <-- ajuste para o caminho do seu JDK 11
+        "default": true
+    },
+    {
+        "name": "JavaSE-1.8",
+        "path": "C:/Program Files (x86)/Java/jre-1.8"  // <-- opcional, se quiser rodar também no 1.8
+    }
+]
+}
