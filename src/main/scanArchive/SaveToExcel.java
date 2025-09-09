@@ -80,19 +80,22 @@ public class SaveToExcel {
 	        
 	        int rowPosition = 2; 
 	        
+	        Row row = sheet.getRow(rowPosition - 1);
+	        row.createCell(6).setCellValue("Nome líder");
+        	row.createCell(7).setCellValue("Saldo percentual positivo");
+        	row.createCell(8).setCellValue("Saldo percentual negativo");
+	        
 	        for(Map.Entry<String, List<EmpregadoJuncao>> entry : lideres.entrySet()) {
 	        	
 	        	List<EmpregadoJuncao> empregadosPerLider = entry.getValue();
 	        	
-	        	Row row = sheet.getRow(rowPosition);
+	        	row = sheet.getRow(rowPosition);
 	        	
 	        	float saldoPositivoPercentual = (float) 0.0;
 	        	float saldoNegativoPercentual = (float) 0.0;
 	        	
 	        	for (EmpregadoJuncao empregadoIterable : empregadosPerLider) {
 					
-	        		System.out.println(empregadoIterable.getSaldo());
-	        		
 	        		if(empregadoIterable.getSaldo() != null && empregadoIterable.getSaldo().contains("-")) {
 	        			saldoNegativoPercentual++;
 	        		}else if(empregadoIterable.getSaldo() != null){

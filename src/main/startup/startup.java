@@ -66,7 +66,6 @@ public class startup {
 		for (EmpregadoExcel excelEmpregado : empregadosExcel) {
 			
 		    EmpregadoJuncao empregadoJuncao = new EmpregadoJuncao();
-		    empregadoJuncao.setNome(excelEmpregado.getNome());
 		    empregadoJuncao.setModeloBh(excelEmpregado.getModeloBH()); 
 
 		    // Buscar dados do líder
@@ -75,14 +74,13 @@ public class startup {
 		    	String texto = Normalizer.normalize(empregadoLideres.getNome(), Normalizer.Form.NFD)
 	                    .replaceAll("\\p{M}", "") // remove acentos
 	                    .replaceAll("[^a-zA-Z0-9 ]", "") // remove caracteres especiais
-	                    .toLowerCase()
 	                    .trim();
 		    	
 		    	empregadoLideres.setNome(texto);
 		    	
 		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim()
 		        		.equals(empregadoLideres.getMatricula().replaceAll("^[A-Z]", "").trim())) {
-		        	
+		        	empregadoJuncao.setNome(empregadoLideres.getNome());
 		            empregadoJuncao.setMatricula(excelEmpregado.getMatricula());
 		            empregadoJuncao.setLider(empregadoLideres.getLider());
 		            break;
@@ -91,11 +89,6 @@ public class startup {
 
 		    // Buscar dados do PDF
 		    for (EmpregadoPdf empregadoPdf : empregadosPdf) {
-		    	
-		    	System.out.println("---------------");
-		    	System.out.println(excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim());
-		    	System.out.println(empregadoPdf.getMatricula().replaceAll("^[A-Z]", "")
-		        		.substring(1));
 		    	
 		        if (excelEmpregado.getMatricula().replaceAll("^[A-Z]", "").trim().equals(
 		        		empregadoPdf.getMatricula().replaceAll("^[A-Z]", "")
@@ -106,6 +99,13 @@ public class startup {
 		        }
 		    }
 
+		    if(empregadoJuncao.getSaldo() != null && empregadoJuncao.getSaldo().trim() != "") {
+		    	if(empregadoJuncao.getNome() == null || empregadoJuncao.getNome().trim() == "") {
+		    		
+		    		empregadoJuncao.setNome(excelEmpregado.getNome());
+		    	}
+		    }
+		    
 		    empregadoJuncaos.add(empregadoJuncao);
 		}
 		
