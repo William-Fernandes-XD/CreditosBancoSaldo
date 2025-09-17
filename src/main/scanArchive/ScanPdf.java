@@ -140,7 +140,18 @@ public class ScanPdf {
 										}
 									}
 									
-									empregadoPdf.setSaldoCiclo(saldo);
+									System.out.println(saldo);
+									
+									String saldoFormatado = ""; // sem ser como 001:29 e sim 1:29
+ 									
+									String[] partes = saldo.split(":");
+									int numero = Integer.parseInt(partes[0]);
+									
+									saldoFormatado = numero + ":" + partes[1];
+									
+									System.out.println(saldoFormatado);
+									
+									empregadoPdf.setSaldoCiclo(saldoFormatado);
 
 								}
 							}
